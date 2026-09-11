@@ -1,0 +1,25 @@
+{
+  "name": "YooAsset.Alipay",
+  "rootNamespace": "YooAsset.Alipay",
+  "references": [
+    "YooAsset.Runtime",
+    "YooAsset",
+    "GameFrameX.Runtime",
+    "GameFrameX.Asset.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.alipay.alipaysdk",
+      "expression": "",
+      "define": "ENABLE_ALIPAY_MINI_GAME"
+    }
+  ],
+  "noEngineReferences": false
+}

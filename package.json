@@ -1,16 +1,16 @@
 {
-  "name": "com.gameframex.unity.tuyoogame.yooasset.minigame.alipay",
-  "displayName": "Game Frame X YooAsset MiniGame Alipay",
+  "name": "com.gameframex.unity.tuyoogame.yooasset.alipay",
+  "displayName": "Game Frame X YooAsset Alipay",
   "category": "Game Framework X",
-  "description": "Game Frame X YooAsset MiniGame Alipay Component",
+  "description": "YooAsset Alipay mini-game FileSystem adapter | YooAsset 支付宝小游戏适配",
   "version": "1.0.2",
   "unity": "2019.4",
   "keywords": [
     "GameFrameX"
   ],
   "repository": {
-    "name": "com.gameframex.unity.tuyoogame.yooasset.minigame.alipay",
-    "url": "git+https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.minigame.alipay.git",
+    "name": "com.gameframex.unity.tuyoogame.yooasset.alipay",
+    "url": "git+https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay.git",
     "type": "git"
   },
   "author": {
@@ -19,7 +19,8 @@
     "url": "https://alianblank.com/"
   },
   "dependencies": {
-    "com.gameframex.unity.tuyoogame.yooasset": "2.9.4"
+    "com.gameframex.unity.tuyoogame.yooasset": "2.9.4",
+    "com.gameframex.unity.asset": "3.1.1"
   },
   "publishConfig": {
     "access": "public",
@@ -31,6 +32,6 @@
     "@semantic-release/git": "^10.0.1"
   },
   "documentationUrl": "https://gameframex.doc.alianblank.com",
-  "changelogUrl": "https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.minigame.alipay/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.minigame.alipay/blob/main/LICENSE.md"
+  "changelogUrl": "https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/blob/main/LICENSE.md"
 }

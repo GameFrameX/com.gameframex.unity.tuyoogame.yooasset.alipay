@@ -1,59 +1,71 @@
-#if UNITY_WEBGL && UNITY_ALIMINIGAME
-using System;
+#if UNITY_WEBGL && ENABLE_ALIPAY_MINI_GAME && ALIPAYMINIGAME
 using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
-using AlipaySdk;
 
-public static class AlipayFileSystemCreater
+namespace YooAsset.Alipay
 {
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteServices remoteServices)
+
+[UnityEngine.Scripting.Preserve]
+public static class AliPayFileSystemCreater
+{
+    [UnityEngine.Scripting.Preserve]
+    public static FileSystemParameters CreateAliPayFileSystemParameters(IRemoteServices remoteServices = null)
     {
-        string fileSystemClass = typeof(AlipayFileSystem).FullName;
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
+        string fileSystemClass = typeof(AliPayFileSystem).FullName;
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
         return fileSystemParams;
     }
 
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteServices remoteServices, IWebDecryptionServices decryptionServices)
+    [UnityEngine.Scripting.Preserve]
+    public static FileSystemParameters CreateAliPayPathFileSystemParameters(string buildinPackRoot)
     {
-        string fileSystemClass = typeof(AlipayFileSystem).FullName;
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
+        string fileSystemClass = typeof(AliPayFileSystem).FullName;
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+        IRemoteServices remoteServices = new AliPayFileSystem.WebRemoteServices(buildinPackRoot);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
-        fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
         return fileSystemParams;
     }
 }
 
 /// <summary>
 /// 支付宝小游戏文件系统
-/// 参考：https://opendocs.alipay.com/mini-game/0ftleg
+/// 参考：https://opendocs.alipay.com/mini/introduce
 /// </summary>
-internal class AlipayFileSystem : IFileSystem
+[UnityEngine.Scripting.Preserve]
+internal class AliPayFileSystem : IFileSystem
 {
-    private class WebRemoteServices : IRemoteServices
+    [UnityEngine.Scripting.Preserve]
+    public class WebRemoteServices : IRemoteServices
     {
         private readonly string _webPackageRoot;
         protected readonly Dictionary<string, string> _mapping = new Dictionary<string, string>(10000);
 
+        [UnityEngine.Scripting.Preserve]
         public WebRemoteServices(string buildinPackRoot)
         {
             _webPackageRoot = buildinPackRoot;
         }
-        string IRemoteServices.GetRemoteMainURL(string fileName)
+
+        [UnityEngine.Scripting.Preserve]
+        string IRemoteServices.GetRemoteMainURL(string fileName, string packageVersion)
         {
-            return GetFileLoadURL(fileName);
-        }
-        string IRemoteServices.GetRemoteFallbackURL(string fileName)
-        {
-            return GetFileLoadURL(fileName);
+            return GetFileLoadURL(fileName, packageVersion);
         }
 
-        private string GetFileLoadURL(string fileName)
+        [UnityEngine.Scripting.Preserve]
+        string IRemoteServices.GetRemoteFallbackURL(string fileName, string packageVersion)
+        {
+            return GetFileLoadURL(fileName, packageVersion);
+        }
+
+        [UnityEngine.Scripting.Preserve]
+        private string GetFileLoadURL(string fileName, string packageVersion)
         {
             if (_mapping.TryGetValue(fileName, out string url) == false)
             {
-                string filePath = PathUtility.Combine(_webPackageRoot, fileName);
+                var filePath = PathUtility.Combine(_webPackageRoot, fileName);
                 url = DownloadSystemHelper.ConvertToWWWPath(filePath);
                 _mapping.Add(fileName, url);
             }
@@ -61,9 +73,9 @@ internal class AlipayFileSystem : IFileSystem
         }
     }
 
-    private readonly Dictionary<string, string> _cacheFilePathMapping = new Dictionary<string, string>(10000);
-    private AlipayFSManager _fileSystemMgr;
-    private string _aliCacheRoot = string.Empty;
+    private readonly Dictionary<string, string> _cacheFilePaths = new Dictionary<string, string>(10000);
+    private AlipaySdk.AlipayFSManager _fileSystemManager;
+    private string _fileCacheRoot = string.Empty;
 
     /// <summary>
     /// 包裹名称
@@ -75,10 +87,7 @@ internal class AlipayFileSystem : IFileSystem
     /// </summary>
     public string FileRoot
     {
-        get
-        {
-            return _aliCacheRoot;
-        }
+        get { return _fileCacheRoot; }
     }
 
     /// <summary>
@@ -86,195 +95,230 @@ internal class AlipayFileSystem : IFileSystem
     /// </summary>
     public int FileCount
     {
-        get
-        {
-            return 0;
-        }
+        get { return 0; }
     }
 
+    public string PackageVersion { get; set; }
+
     #region 自定义参数
+
     /// <summary>
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
 
-    /// <summary>
-    ///  自定义参数：解密方法类
-    /// </summary>
-    public IWebDecryptionServices DecryptionServices { private set; get; }
-
-    /// <summary>
-    /// 自定义参数：资源清单服务类
-    /// </summary>
-    public IManifestRestoreServices ManifestServices { private set; get; }
     #endregion
 
     [UnityEngine.Scripting.Preserve]
-    public AlipayFileSystem()
+    public AliPayFileSystem()
     {
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual FSInitializeFileSystemOperation InitializeFileSystemAsync()
     {
-        var operation = new APFSInitializeOperation(this);
+        var operation = new ALFSInitializeOperation(this);
+        OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
     {
-        var operation = new APFSLoadPackageManifestOperation(this, packageVersion, timeout);
+        PackageVersion = packageVersion;
+        var operation = new ALFSLoadPackageManifestOperation(this, packageVersion, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
     {
-        var operation = new APFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
+        var operation = new ALFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
-    public virtual FSClearCacheFilesOperation ClearCacheFilesAsync(PackageManifest manifest, ClearCacheFilesOptions options)
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
     {
-        var operation = new FSClearCacheFilesCompleteOperation();
+        var operation = new FSClearAllBundleFilesCompleteOperation();
+        OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
-    public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadFileOptions options)
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
     {
-        string mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
-        string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
-        options.SetURL(mainURL, fallbackURL);
-        var operation = new APFSDownloadFileOperation(this, bundle, options);
+        var operation = new FSClearUnusedBundleFilesCompleteOperation();
+        OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
+    {
+        param.MainURL = RemoteServices.GetRemoteMainURL(bundle.FileName, PackageVersion);
+        param.FallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName, PackageVersion);
+        var operation = new ALFSDownloadFileOperation(this, bundle, param);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
     {
-        if (bundle.BundleType == (int)EBuildBundleType.AssetBundle)
+        var operation = new ALFSLoadBundleOperation(this, bundle, PackageVersion);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual void UnloadBundleFile(PackageBundle bundle, object result)
+    {
+        AssetBundle assetBundle = result as AssetBundle;
+        if (assetBundle != null)
         {
-            var operation = new APFSLoadBundleOperation(this, bundle);
-            return operation;
-        }
-        else
-        {
-            string error = $"{nameof(AlipayFileSystem)} not support load bundle type : {bundle.BundleType}";
-            var operation = new FSLoadBundleCompleteOperation(error);
-            return operation;
+            assetBundle.Unload(true);
         }
     }
 
+    [UnityEngine.Scripting.Preserve]
     public virtual void SetParameter(string name, object value)
     {
         if (name == FileSystemParametersDefine.REMOTE_SERVICES)
         {
             RemoteServices = (IRemoteServices)value;
         }
-        else if (name == FileSystemParametersDefine.DECRYPTION_SERVICES)
-        {
-            DecryptionServices = (IWebDecryptionServices)value;
-        }
-        else if (name == FileSystemParametersDefine.MANIFEST_SERVICES)
-        {
-            ManifestServices = (IManifestRestoreServices)value;
-        }
         else
         {
             YooLogger.Warning($"Invalid parameter : {name}");
         }
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual void OnCreate(string packageName, string rootDirectory)
     {
         PackageName = packageName;
-        _aliCacheRoot = rootDirectory;
 
-        if (string.IsNullOrEmpty(_aliCacheRoot))
-        {
-            throw new System.Exception("请配置小游戏的缓存根目录！");
-        }
-
-        // 注意：CDN服务未启用的情况下，使用WEB服务器
+        // 注意：CDN服务未启用的情况下，使用支付宝WEB服务器
         if (RemoteServices == null)
         {
             string webRoot = PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName, packageName);
             RemoteServices = new WebRemoteServices(webRoot);
         }
 
-        _fileSystemMgr = AlipaySDK.API.GetFileSystemManager();
+        _fileSystemManager = AlipaySdk.AlipaySDK.API.GetFileSystemManager();
+#if UNITY_EDITOR
+        _fileCacheRoot = Application.persistentDataPath;
+        return;
+#endif
+        _fileCacheRoot = AlipaySdk.AlipaySDK.env;
     }
-    public virtual void OnDestroy()
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual void OnUpdate()
     {
     }
 
+    [UnityEngine.Scripting.Preserve]
     public virtual bool Belong(PackageBundle bundle)
     {
         return true;
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual bool Exists(PackageBundle bundle)
     {
-        return CheckCacheFileExist(bundle);
+        string filePath = GetCacheFileLoadPath(bundle);
+        string result = _fileSystemManager.AccessSync(filePath);
+        return result.Equals("access:ok");
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual bool NeedDownload(PackageBundle bundle)
     {
         if (Belong(bundle) == false)
+        {
             return false;
+        }
 
         return Exists(bundle) == false;
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual bool NeedUnpack(PackageBundle bundle)
     {
         return false;
     }
+
+    [UnityEngine.Scripting.Preserve]
     public virtual bool NeedImport(PackageBundle bundle)
     {
         return false;
     }
 
-    public virtual string GetBundleFilePath(PackageBundle bundle)
+    [UnityEngine.Scripting.Preserve]
+    public virtual byte[] ReadFileData(PackageBundle bundle)
     {
-        return GetCacheFileLoadPath(bundle);
+        throw new System.NotImplementedException();
     }
-    public virtual byte[] ReadBundleFileData(PackageBundle bundle)
+
+    [UnityEngine.Scripting.Preserve]
+    public virtual string ReadFileText(PackageBundle bundle)
     {
-        if (CheckCacheFileExist(bundle))
-        {
-            string filePath = GetCacheFileLoadPath(bundle);
-            return _fileSystemMgr.ReadFileSync(filePath);
-        }
-        else
-        {
-            return Array.Empty<byte>();
-        }
-    }
-    public virtual string ReadBundleFileText(PackageBundle bundle)
-    {
-        if (CheckCacheFileExist(bundle))
-        {
-            string filePath = GetCacheFileLoadPath(bundle);
-            return _fileSystemMgr.ReadFileSync(filePath, "utf8");
-        }
-        else
-        {
-            return string.Empty;
-        }
+        throw new System.NotImplementedException();
     }
 
     #region 内部方法
-    public AlipayFSManager GetFileSystemMgr()
-    {
-        return _fileSystemMgr;
-    }
-    public bool CheckCacheFileExist(PackageBundle bundle)
-    {
-        //TODO : 效率极低
-        /*
-        string filePath = GetCacheFileLoadPath(bundle);
-        string result = _fileSystemMgr.AccessSync(filePath);
-        return result.Equals("access:ok", StringComparison.Ordinal);
-        */
-        return false;
-    }
+
+    [UnityEngine.Scripting.Preserve]
     private string GetCacheFileLoadPath(PackageBundle bundle)
     {
-        if (_cacheFilePathMapping.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+        if (_cacheFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
         {
-            filePath = PathUtility.Combine(_aliCacheRoot, bundle.FileName);
-            _cacheFilePathMapping.Add(bundle.BundleGUID, filePath);
+            filePath = PathUtility.Combine(_fileCacheRoot, bundle.FileName);
+            _cacheFilePaths.Add(bundle.BundleGUID, filePath);
         }
+
         return filePath;
     }
+
+    [UnityEngine.Scripting.Preserve]
+    public FSRequestPackageVersionOperation LoadLocalPackageVersionAsync(bool appendTimeTicks, int timeout)
+    {
+        var operation = new ALFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    [UnityEngine.Scripting.Preserve]
+    public FSLoadPackageManifestOperation LoadLocalPackageManifestAsync(string packageVersion, int timeout)
+    {
+        PackageVersion = packageVersion;
+        var operation = new ALFSLoadPackageManifestOperation(this, packageVersion, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    [UnityEngine.Scripting.Preserve]
+    public FSLoadPackageManifestOperation RequestRemotePackageManifestAsync(string packageVersion, int timeout)
+    {
+        PackageVersion = packageVersion;
+        var operation = new ALFSLoadPackageManifestOperation(this, packageVersion, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    [UnityEngine.Scripting.Preserve]
+    public FSRequestPackageVersionOperation RequestRemotePackageVersionAsync(bool appendTimeTicks, int timeout)
+    {
+        var operation = new ALFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
     #endregion
+}
 }
 #endif
