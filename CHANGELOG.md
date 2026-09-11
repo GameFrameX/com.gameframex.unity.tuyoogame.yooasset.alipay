@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/1.0.2...1.1.0) (2026-09-11)
+
+
+### Features
+
+* **refactor:** Provider/Creater/asmdef/Operation 改造 + package.json 调整 ([3c685eb](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/commit/3c685ebf23c22b888a4a00cf13ae463faf4a08e8))
+
 ## [1.0.2](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/1.0.1...1.0.2) (2026-07-30)
 
 
