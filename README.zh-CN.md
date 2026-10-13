@@ -55,7 +55,7 @@
     }
   ],
   "dependencies": {
-    "com.gameframex.unity.tuyoogame.yooasset.alipay": "1.0.2"
+    "com.gameframex.unity.tuyoogame.yooasset.alipay": "1.2.0"
   }
 }
    ```
@@ -73,6 +73,10 @@
 `
 4. 直接下载仓库放置到 Unity 项目的 `Packages` 目录下，会自动加载识别。
 
+### 升级说明
+
+> **1.2.0 破坏性变更：** 本包不再依赖 `com.gameframex.unity.asset`，仅依赖 `com.gameframex.unity.tuyoogame.yooasset`（≥ 3.1.0）。升级时必须同时将主包升级到 ≥ 3.1.0；若工程安装了 asset 包，需同步升级到 ≥ 4.1.0。同时安装 asset ≥ 4.1.0 的工程不受影响。
+
 ### 使用示例
 
 使用内置的 `AliPayFileSystemCreater` 获取支付宝小游戏运行时的 `WebPlayModeParameters`。
@@ -88,8 +92,12 @@ createParameters.WebFileSystemParameters = AliPayFileSystemCreater.CreateAliPayF
 
 | 包 | 说明 |
 | --- | --- |
-| com.gameframex.unity.tuyoogame.yooasset | 2.9.4 — YooAsset 核心运行时与 API。 |
-| com.gameframex.unity.asset | 3.1.1 — GameFrameX 资源/运行时集成。 |
+| com.gameframex.unity.tuyoogame.yooasset | ≥ 3.1.0 — YooAsset 核心运行时与 API。 |
+
+
+## 注册即分发机制
+
+本包提供的 `AliPayWebPlayModeFileSystemProvider`（Priority 4）会在 `BeforeSceneLoad` 阶段自注册到主包的 `WebPlayModeFileSystemProviderRegistry`，该时序早于首次 Web 模式初始化。初始化时 asset 抽象层按 Priority 互斥解析（Priority 最高者胜出，同优先级取注册序首个），只会初始化并选用一个平台文件系统。
 
 ## 文档与资源
 

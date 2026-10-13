@@ -60,8 +60,8 @@ namespace YooAsset.Alipay
                 typeof(RequestAliPayPackageVersionOperation),
                 typeof(RequestAliPayPackageHashOperation),
                 typeof(LoadAliPayPackageManifestOperation),
-                typeof(AliPayConfigHandler),
                 typeof(AliPayWebPlayModeFileSystemProvider),
+                typeof(AliPayWebPlayModeFileSystemProvider.Registrar),
             };
 #endif
         }

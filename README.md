@@ -55,7 +55,7 @@ Choose one of the following methods:
     }
   ],
   "dependencies": {
-    "com.gameframex.unity.tuyoogame.yooasset.alipay": "1.0.2"
+    "com.gameframex.unity.tuyoogame.yooasset.alipay": "1.2.0"
   }
 }
    ```
@@ -72,6 +72,10 @@ Choose one of the following methods:
 3. In Unity's **Package Manager**, add via **Git URL**: `https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay.git`.
 4. Clone the repository into your Unity project's `Packages/` directory; it will be picked up automatically.
 
+### Upgrade Notes
+
+> **Breaking change in 1.2.0:** This package no longer depends on `com.gameframex.unity.asset`; its only dependency is now `com.gameframex.unity.tuyoogame.yooasset` (≥ 3.1.0). When upgrading, the core YooAsset package must also be upgraded to ≥ 3.1.0, and if the project installs the asset package, upgrade it to ≥ 4.1.0. Projects that also install asset ≥ 4.1.0 are otherwise unaffected.
+
 ### Usage Examples
 
 Use the bundled `AliPayFileSystemCreater` to obtain `WebPlayModeParameters` for the Alipay mini-game runtime.
@@ -87,8 +91,12 @@ createParameters.WebFileSystemParameters = AliPayFileSystemCreater.CreateAliPayF
 
 | Package | Description |
 | --- | --- |
-| com.gameframex.unity.tuyoogame.yooasset | 2.9.4 — Core YooAsset runtime & API. |
-| com.gameframex.unity.asset | 3.1.1 — GameFrameX asset/runtime integration. |
+| com.gameframex.unity.tuyoogame.yooasset | ≥ 3.1.0 — Core YooAsset runtime & API. |
+
+
+## Register-and-Dispatch Mechanism
+
+The `AliPayWebPlayModeFileSystemProvider` (Priority 4) provided by this package self-registers into the core package's `WebPlayModeFileSystemProviderRegistry` at `BeforeSceneLoad`, which runs earlier than the first Web-mode initialization. At initialization, the asset abstraction layer resolves providers exclusively by Priority (highest wins; on equal priority the first registered wins) and initializes exactly one platform file system. This means only one platform provider is ever selected per initialization.
 
 ## Documentation & Resources
 

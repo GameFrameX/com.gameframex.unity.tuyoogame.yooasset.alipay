@@ -3,9 +3,7 @@
   "rootNamespace": "YooAsset.Alipay",
   "references": [
     "YooAsset.Runtime",
-    "YooAsset",
-    "GameFrameX.Runtime",
-    "GameFrameX.Asset.Runtime"
+    "YooAsset"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

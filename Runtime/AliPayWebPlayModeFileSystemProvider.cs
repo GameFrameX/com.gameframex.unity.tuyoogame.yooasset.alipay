@@ -27,8 +27,6 @@
 //   Official Documentation: https://gameframex.doc.alianblank.com/
 //  ==========================================================================================
 
-using GameFrameX.Asset.Runtime;
-using GameFrameX.Runtime;
 using UnityEngine;
 using YooAsset;
 
@@ -54,10 +52,8 @@ namespace YooAsset.Alipay
 
         public FileSystemParameters CreateFileSystemParameters(WebPlayModeProviderContext context)
         {
-            // 支付宝小游戏暂无类似微信/快手的全局预加载API
-            GameEntry.GetComponent<AssetComponent>().gameObject.GetOrAddComponent<AliPayConfigHandler>();
             // 创建支付宝小游戏文件系统
-            if (context.HostServerURL.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(context.HostServerURL))
             {
                 return AliPayFileSystemCreater.CreateAliPayFileSystemParameters();
             }
@@ -68,6 +64,7 @@ namespace YooAsset.Alipay
         /// <summary>
         /// 运行时自动注册
         /// </summary>
+        [UnityEngine.Scripting.Preserve]
         internal static class Registrar
         {
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
