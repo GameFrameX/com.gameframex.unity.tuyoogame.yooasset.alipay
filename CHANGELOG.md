@@ -1,3 +1,20 @@
+# [2.0.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/1.1.0...2.0.0) (2026-10-15)
+
+
+### Bug Fixes
+
+* **package:** 对齐 yooasset 3.1.0 依赖并修正品牌命名 ([e8380a5](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/commit/e8380a5dc103bcae078cbb8c078b752e85dc01e0))
+
+
+### Features
+
+* **provider:** 接入主包注册表并解除 asset 层依赖 ([66731fc](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/commit/66731fc26c31e310d5485ac00678e66e53605bbf))
+
+
+### BREAKING CHANGES
+
+* **provider:** 不再依赖 com.gameframex.unity.asset。
+
 # [1.1.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/1.0.2...1.1.0) (2026-09-11)
 
 
