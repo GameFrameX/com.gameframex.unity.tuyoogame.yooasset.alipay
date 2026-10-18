@@ -10,21 +10,23 @@ namespace YooAsset.Alipay
 public static class AliPayFileSystemCreater
 {
     [UnityEngine.Scripting.Preserve]
-    public static FileSystemParameters CreateAliPayFileSystemParameters(IRemoteServices remoteServices = null)
+    public static FileSystemParameters CreateAliPayFileSystemParameters(IRemoteServices remoteServices = null, AliPayFileSystemOption option = null)
     {
         string fileSystemClass = typeof(AliPayFileSystem).FullName;
         var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
+        fileSystemParams.AddParameter(AliPayFileSystemOption.ParameterKey, option ?? new AliPayFileSystemOption());
         return fileSystemParams;
     }
 
     [UnityEngine.Scripting.Preserve]
-    public static FileSystemParameters CreateAliPayPathFileSystemParameters(string buildinPackRoot)
+    public static FileSystemParameters CreateAliPayPathFileSystemParameters(string buildinPackRoot, AliPayFileSystemOption option = null)
     {
         string fileSystemClass = typeof(AliPayFileSystem).FullName;
         var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
         IRemoteServices remoteServices = new AliPayFileSystem.WebRemoteServices(buildinPackRoot);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
+        fileSystemParams.AddParameter(AliPayFileSystemOption.ParameterKey, option ?? new AliPayFileSystemOption());
         return fileSystemParams;
     }
 }
@@ -106,6 +108,11 @@ internal class AliPayFileSystem : IFileSystem
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
+
+    /// <summary>
+    /// 自定义参数：文件系统选项（直载 bundle 重试参数；未传时保持默认实例，永不为 null）
+    /// </summary>
+    public AliPayFileSystemOption Option { private set; get; } = new AliPayFileSystemOption();
 
     #endregion
 
@@ -189,6 +196,10 @@ internal class AliPayFileSystem : IFileSystem
         if (name == FileSystemParametersDefine.REMOTE_SERVICES)
         {
             RemoteServices = (IRemoteServices)value;
+        }
+        else if (name == AliPayFileSystemOption.ParameterKey)
+        {
+            Option = (AliPayFileSystemOption)value ?? new AliPayFileSystemOption();
         }
         else
         {
