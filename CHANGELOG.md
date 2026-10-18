@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/2.0.0...2.1.0) (2026-10-18)
+
+
+### Features
+
+* **filesystem:** 直载重试参数 Option 化并派生基类 ([042ba8f](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/commit/042ba8fcccad0493f2132dc02be477936a16f151))
+
 # [2.0.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/1.1.0...2.0.0) (2026-10-15)
 
 
