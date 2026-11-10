@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/2.1.0...2.1.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **tuyoogame.yooasset.alipay:** 添加完整 link.xml 防代码裁剪保护 ([7753ca7](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/commit/7753ca7bf6af6ae920ba91db5c83c418de3d2cf3))
+
 # [2.1.0](https://github.com/gameframex/com.gameframex.unity.tuyoogame.yooasset.alipay/compare/2.0.0...2.1.0) (2026-10-18)
 
 
